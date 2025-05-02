@@ -57,5 +57,15 @@ CONSTRAINT PK_statement_id PRIMARY KEY (statement_id),
 CONSTRAINT FK_account_id_two FOREIGN KEY (account_id) REFERENCES BankAccount(account_id)
 )
 
-
+DELIMITER $$
+CREATE TRIGGER trg_bankaccount_set_acctno
+BEFORE INSERT ON BankAccount
+FOR EACH ROW
+BEGIN
+    IF NEW.account_number IS NULL THEN
+        SET NEW.account_number :=
+            COALESCE((SELECT MAX(account_number) FROM BankAccount), 1000000000) + 1;
+    END IF;
+END$$
+DELIMITER ;  
 
